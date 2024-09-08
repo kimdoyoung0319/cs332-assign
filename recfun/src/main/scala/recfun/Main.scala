@@ -12,7 +12,7 @@ object Main {
   }
 
   def pascal(col: Int, row: Int): Int = {
-    if(col == row || col == 0) 1
+    if (col == row || col == 0) 1
     else pascal(col, row - 1) + pascal(col - 1, row - 1)
   }
 
@@ -24,7 +24,7 @@ object Main {
         remaining.head match {
           case '(' => loop(false, count + 1, remaining.tail)
           case ')' => loop(count == 1, count - 1, remaining.tail)
-          case _ => loop(accum, count, remaining.tail)
+          case _   => loop(accum, count, remaining.tail)
         }
       }
     }
@@ -35,10 +35,17 @@ object Main {
   def countChange(money: Int, coins: List[Int]): Int = {
     val sorted = coins.sorted.reverse
 
-    def loop(remaining: Int, coins: List[Int]): Int = 
-      if (remaining < coins.head)
-        loop(remaining, coins.tail)
-      else (remaining)
+    def loop(remaining: Int, coins: List[Int]): Int =
+      (remaining, coins) match {
+        case (0, _)   => 1
+        case (_, Nil) => 0
+        case (_, head :: Nil) =>
+          if (remaining < head) 0 else loop(remaining - head, coins)
+        case (_, head :: tail) =>
+          if (remaining < head) loop(remaining, tail)
+          else loop(remaining - head, coins) + loop(remaining, tail)
+      }
 
+    loop(money, sorted)
   }
 }
