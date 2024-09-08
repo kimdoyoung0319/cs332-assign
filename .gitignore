@@ -6,6 +6,10 @@
 *.class
 *.log
 
-# Ignore lib and project directories
+# Ignore directories other than the source directory
 lib/
+lib_managed/
 project/
+recitations/
+submission/
+target/
