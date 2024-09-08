@@ -1,0 +1,11 @@
+# Ignore all dotfiles except this gitignore itself
+.*
+!.gitignore
+
+# Ignore all complie results and logs
+*.class
+*.log
+
+# Ignore lib and project directories
+lib/
+project/
