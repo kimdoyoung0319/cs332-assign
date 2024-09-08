@@ -1,6 +1,4 @@
 package recfun
-
-import scala.annotation.tailrec
 import common._
 
 object Main {
@@ -14,23 +12,33 @@ object Main {
   }
 
   def pascal(col: Int, row: Int): Int = {
-    @tailrec def loop(cur: Int, cont: Int => Int): Int =
-      if (cur == row)
-        if (col == 0 || col == row) 1 else cont(col) + cont(col - 1)
-      else {
-        val next = (i: Int) =>
-          if (i == cur || i == 0) 1 else cont(i) + cont(i - 1)
-        loop(cur + 1, next)
-      }
-
-    loop(0, _ => 1)
+    if(col == row || col == 0) 1
+    else pascal(col, row - 1) + pascal(col - 1, row - 1)
   }
 
-  /** Exercise 2
-    */
-  def balance(chars: List[Char]): Boolean = ???
+  def balance(chars: List[Char]): Boolean = {
+    def loop(accum: Boolean, count: Int, remaining: List[Char]): Boolean = {
+      if (remaining.isEmpty)
+        accum
+      else {
+        remaining.head match {
+          case '(' => loop(false, count + 1, remaining.tail)
+          case ')' => loop(count == 1, count - 1, remaining.tail)
+          case _ => loop(accum, count, remaining.tail)
+        }
+      }
+    }
 
-  /** Exercise 3
-    */
-  def countChange(money: Int, coins: List[Int]): Int = ???
+    loop(true, 0, chars)
+  }
+
+  def countChange(money: Int, coins: List[Int]): Int = {
+    val sorted = coins.sorted.reverse
+
+    def loop(remaining: Int, coins: List[Int]): Int = 
+      if (remaining < coins.head)
+        loop(remaining, coins.tail)
+      else (remaining)
+
+  }
 }
