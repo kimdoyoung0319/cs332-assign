@@ -39,8 +39,6 @@ object Main {
       (remaining, coins) match {
         case (0, _)   => 1
         case (_, Nil) => 0
-        case (_, head :: Nil) =>
-          if (remaining < head) 0 else loop(remaining - head, coins)
         case (_, head :: tail) =>
           if (remaining < head) loop(remaining, tail)
           else loop(remaining - head, coins) + loop(remaining, tail)
