@@ -21,7 +21,7 @@ object Main {
       for (i <- 0 to index)
         current(i) =
           if (i == 0 || i == index) 1 else previous(i) + previous(i - 1)
-      if (index == row) cur(col) else loop(index + 1, cur)
+      if (index == row) current(col) else loop(index + 1, current)
     }
 
     if (row == 0) 1 else loop(1, Array(1))
