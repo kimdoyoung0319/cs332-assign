@@ -1,5 +1,7 @@
 package recfun
+
 import common._
+import scala.annotation.tailrec
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -12,8 +14,16 @@ object Main {
   }
 
   def pascal(col: Int, row: Int): Int = {
-    if (col == row || col == 0) 1
-    else pascal(col, row - 1) + pascal(col - 1, row - 1)
+    @tailrec
+    def loop(index: Int, prev: Array[Int]): Int = {
+      val cur = new Array[Int](index + 1)
+      for (i <- 0 to index) 
+        cur(i) = if (i == 0 || i == index) 1 else prev(i) + prev(i - 1)
+      
+      if (index == row) cur(col) else loop(index + 1, cur)
+    }
+
+    if (row == 0) 1 else loop(1, Array(1))
   }
 
   def balance(chars: List[Char]): Boolean = {
