@@ -14,12 +14,13 @@ object Main {
   }
 
   def pascal(col: Int, row: Int): Int = {
+
     @tailrec
-    def loop(index: Int, prev: Array[Int]): Int = {
-      val cur = new Array[Int](index + 1)
-      for (i <- 0 to index) 
-        cur(i) = if (i == 0 || i == index) 1 else prev(i) + prev(i - 1)
-      
+    def loop(index: Int, previous: Array[Int]): Int = {
+      val current = new Array[Int](index + 1)
+      for (i <- 0 to index)
+        current(i) =
+          if (i == 0 || i == index) 1 else previous(i) + previous(i - 1)
       if (index == row) cur(col) else loop(index + 1, cur)
     }
 
@@ -27,15 +28,13 @@ object Main {
   }
 
   def balance(chars: List[Char]): Boolean = {
+
     def loop(accum: Boolean, count: Int, remaining: List[Char]): Boolean = {
-      if (remaining.isEmpty)
-        accum
-      else {
-        remaining.head match {
-          case '(' => loop(false, count + 1, remaining.tail)
-          case ')' => loop(count == 1, count - 1, remaining.tail)
-          case _   => loop(accum, count, remaining.tail)
-        }
+      remaining match {
+        case Nil         => accum
+        case '(' :: tail => loop(false, count + 1, tail)
+        case ')' :: tail => loop(count == 1, count - 1, tail)
+        case _ :: tail   => loop(accum, count, tail)
       }
     }
 
