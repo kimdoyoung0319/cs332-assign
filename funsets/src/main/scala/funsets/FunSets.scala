@@ -1,89 +1,104 @@
 package funsets
 
 import common._
+import scala.annotation.tailrec
 
-/**
- * 2. Purely Functional Sets.
- */
+/** 2. Purely Functional Sets.
+  */
 object FunSets {
-  /**
-   * We represent a set by its characteristic function, i.e.
-   * its `contains` predicate.
-   */
+
+  /** We represent a set by its characteristic function, i.e. its `contains`
+    * predicate.
+    */
   type Set = Int => Boolean
 
-  /**
-   * Indicates whether a set contains a given element.
-   */
-  def contains(s: Set, elem: Int): Boolean = s(elem)
+  /** Indicates whether a set contains a given element.
+    */
+  def contains(set: Set, elem: Int): Boolean = set(elem)
 
-  /**
-   * Returns the set of the one given element.
-   */
-  def singletonSet(elem: Int): Set = ???
+  /** Returns the set of the one given element.
+    */
+  def singletonSet(elem: Int): Set = (_ == elem)
 
-  /**
-   * Returns the union of the two given sets,
-   * the sets of all elements that are in either `s` or `t`.
-   */
-  def union(s: Set, t: Set): Set = ???
+  /** Returns the union of the two given sets, the sets of all elements that are
+    * in either `first` or `second`.
+    */
+  def union(first: Set, second: Set): Set =
+    elem => contains(first, elem) || contains(second, elem)
 
-  /**
-   * Returns the intersection of the two given sets,
-   * the set of all elements that are both in `s` and `t`.
-   */
-  def intersect(s: Set, t: Set): Set = ???
+  /** Returns the intersection of the two given sets, the set of all elements
+    * that are both in `first` and `second`.
+    */
+  def intersect(first: Set, second: Set): Set =
+    elem => contains(first, elem) && contains(second, elem)
 
-  /**
-   * Returns the difference of the two given sets,
-   * the set of all elements of `s` that are not in `t`.
-   */
-  def diff(s: Set, t: Set): Set = ???
+  /** Returns the difference of the two given sets, the set of all elements of
+    * `first` that are not in `second`.
+    */
+  def diff(first: Set, second: Set): Set =
+    elem => contains(first, elem) && !contains(second, elem)
 
-  /**
-   * Returns the subset of `s` for which `p` holds.
-   */
-  def filter(s: Set, p: Int => Boolean): Set = ???
+  /** Returns the subset of `set` for which `predicate` holds.
+    */
+  def filter(set: Set, predicate: Int => Boolean): Set =
+    elem => contains(set, elem) && predicate(elem)
 
-  /**
-   * The bounds for `forall` and `exists` are +/- 1000.
-   */
-  val bound = 1000
+  /** The bounds for `forall` and `exists` are +/- 1000.
+    */
+  val UpperBound = 1000
+  val LowerBound = -1000
 
-  /**
-   * Returns whether all bounded integers within `s` satisfy `p`.
-   */
-  def forall(s: Set, p: Int => Boolean): Boolean = {
-    def iter(a: Int): Boolean = {
-      if (???) ???
-      else if (???) ???
-      else iter(???)
+  /** Returns whether all bounded integers within `set` satisfy `predicate`.
+    */
+  def forall(set: Set, predicate: Int => Boolean): Boolean = {
+
+    @tailrec
+    def loop(index: Int): Boolean = {
+      if (index == UpperBound)
+        true
+      else if (contains(set, index) && !predicate(index))
+        false
+      else
+        loop(index + 1)
     }
-    iter(???)
+
+    loop(LowerBound)
   }
 
-  /**
-   * Returns whether there exists a bounded integer within `s`
-   * that satisfies `p`.
-   */
-  def exists(s: Set, p: Int => Boolean): Boolean = ???
+  /** Returns whether there exists a bounded integer within `set` that satisfies
+    * `predicate`.
+    */
+  def exists(set: Set, predicate: Int => Boolean): Boolean = {
 
-  /**
-   * Returns a set transformed by applying `f` to each element of `s`.
-   */
-  def map(s: Set, f: Int => Int): Set = ???
+    @tailrec
+    def loop(index: Int): Boolean = {
+      if (index == UpperBound)
+        false
+      else if (contains(set, index) && predicate(index))
+        true
+      else
+        loop(index + 1)
+    }
 
-  /**
-   * Displays the contents of a set
-   */
-  def toString(s: Set): String = {
-    val xs = for (i <- -bound to bound if contains(s, i)) yield i
-    xs.mkString("{", ",", "}")
+    loop(LowerBound)
   }
 
-  /**
-   * Prints the contents of a set on the console.
-   */
+  /** Returns a set transformed by applying `transform` to each element of
+    * `set`.
+    */
+  def map(set: Set, transform: Int => Int): Set = ???
+
+  /** Displays the contents of a set
+    */
+  def toString(set: Set): String = {
+    val elemStrings =
+      for (index <- LowerBound to UpperBound if contains(set, index))
+        yield index
+    elemStrings.mkString("{", ",", "}")
+  }
+
+  /** Prints the contents of a set on the console.
+    */
   def printSet(s: Set) {
     println(toString(s))
   }
