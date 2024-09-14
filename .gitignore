@@ -8,6 +8,8 @@
 
 # Ignore directories other than the source directory 
 # and the ones that were included originally
+lib/
+project/
 lib_managed/
 recitations/
 submission/
