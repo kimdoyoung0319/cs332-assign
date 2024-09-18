@@ -54,7 +54,7 @@ object FunSets {
 
     @tailrec
     def loop(index: Int): Boolean = {
-      if (index == UpperBound)
+      if (index > UpperBound)
         true
       else if (contains(set, index) && !predicate(index))
         false
@@ -72,7 +72,7 @@ object FunSets {
 
     @tailrec
     def loop(index: Int): Boolean = {
-      if (index == UpperBound)
+      if (index > UpperBound)
         false
       else if (contains(set, index) && predicate(index))
         true
@@ -83,10 +83,10 @@ object FunSets {
     loop(LowerBound)
   }
 
-  /** Returns a set transformed by applying `transform` to each element of
-    * `set`.
+  /** Returns a set transformed by applying `mapping` to each element of `set`.
     */
-  def map(set: Set, transform: Int => Int): Set = ???
+  def map(set: Set, mapping: Int => Int): Set =
+    (elem: Int) => exists(set, mapping(_) == elem)
 
   /** Displays the contents of a set
     */
