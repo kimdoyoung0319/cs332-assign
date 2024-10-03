@@ -19,46 +19,59 @@ object Huffman {
    * leaves.
    */
   abstract class CodeTree
-  case class Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int) extends CodeTree
+
   case class Leaf(char: Char, weight: Int) extends CodeTree
 
-
+  case class Fork(
+    left: CodeTree, right: CodeTree, chars: List[Char], weight: Int
+  ) extends CodeTree
 
   // Part 1: Basics
+  def weight(tree: CodeTree): Int = 
+    tree match {
+      case Fork(_, _, _, weight) => weight
+      case Leaf(_, weight) => weight
+    }
 
-  def weight(tree: CodeTree): Int = ??? // tree match ...
-
-  def chars(tree: CodeTree): List[Char] = ??? // tree match ...
+  def chars(tree: CodeTree): List[Char] = 
+    tree match {
+      case Fork(_, _, chars, _) => chars
+      case Leaf(char, _) => List(char)
+    }
 
   def makeCodeTree(left: CodeTree, right: CodeTree) =
-    Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
-
+    Fork(
+      left, right, chars(left) ::: chars(right), weight(left) + weight(right)
+    )
 
 
   // Part 2: Generating Huffman trees
 
   /**
-   * In this assignment, we are working with lists of characters. This function allows
-   * you to easily create a character list from a given string.
+   * In this assignment, we are working with lists of characters. This function 
+   * allows you to easily create a character list from a given string.
    */
   def string2Chars(str: String): List[Char] = str.toList
 
   /**
-   * This function computes for each unique character in the list `chars` the number of
-   * times it occurs. For example, the invocation
+   * This function computes for each unique character in the list `chars` the 
+   * number of times it occurs. For example, the invocation
    *
    *   times(List('a', 'b', 'a'))
    *
-   * should return the following (the order of the resulting list is not important):
+   * should return the following (the order of the resulting list is not 
+   * important):
    *
    *   List(('a', 2), ('b', 1))
    *
-   * The type `List[(Char, Int)]` denotes a list of pairs, where each pair consists of a
-   * character and an integer. Pairs can be constructed easily using parentheses:
+   * The type `List[(Char, Int)]` denotes a list of pairs, where each pair 
+   * consists of a character and an integer. Pairs can be constructed easily 
+   * using parentheses:
    *
    *   val pair: (Char, Int) = ('c', 1)
    *
-   * In order to access the two elements of a pair, you can use the accessors `_1` and `_2`:
+   * In order to access the two elements of a pair, you can use the accessors 
+   * `_1` and `_2`:
    *
    *   val theChar = pair._1
    *   val theInt  = pair._2
@@ -71,7 +84,11 @@ object Huffman {
    *       println("integer is  : "+ theInt)
    *   }
    */
-  def times(chars: List[Char]): List[(Char, Int)] = ???
+  def times(chars: List[Char]): List[(Char, Int)] = {
+    val counts = chars.groupBy(identity).mapValues(_.map(_ => 1).reduce(_ + _))
+
+    counts.toList
+  }
 
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
@@ -80,12 +97,16 @@ object Huffman {
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
+    val sorted = freqs.sortBy(_._2)
+
+    sorted.map({case (char: Char, weight: Int) => Leaf(char, weight)})
+  }
 
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
-  def singleton(trees: List[CodeTree]): Boolean = ???
+  def singleton(trees: List[CodeTree]): Boolean = (trees.size == 1)
 
   /**
    * The parameter `trees` of this function is a list of code trees ordered
@@ -93,52 +114,67 @@ object Huffman {
    *
    * This function takes the first two elements of the list `trees` and combines
    * them into a single `Fork` node. This node is then added back into the
-   * remaining elements of `trees` at a position such that the ordering by weights
-   * is preserved.
+   * remaining elements of `trees` at a position such that the ordering by 
+   * weights is preserved.
    *
-   * If `trees` is a list of less than two elements, that list should be returned
-   * unchanged.
+   * If `trees` is a list of less than two elements, that list should be 
+   * returned unchanged.
    */
-  def combine(trees: List[CodeTree]): List[CodeTree] = ???
+  def combine(trees: List[CodeTree]): List[CodeTree] = 
+    trees match {
+      case _ => trees
+      case first :: second :: remaining =>
+        val joined = makeCodeTree(first, second)
+        val index = remaining.indexWhere(weight(_) > weight(joined))
+        val (before, after) = remaining.splitAt(index)
+        before ++ List(joined) ++ after
+    }
 
   /**
    * This function will be called in the following way:
    *
    *   until(singleton, combine)(trees)
    *
-   * where `trees` is of type `List[CodeTree]`, `singleton` and `combine` refer to
-   * the two functions defined above.
+   * where `trees` is of type `List[CodeTree]`, `singleton` and `combine` refer 
+   * to the two functions defined above.
    *
-   * In such an invocation, `until` should call the two functions until the list of
-   * code trees contains only one single tree, and then return that singleton list.
+   * In such an invocation, `until` should call the two functions until the list 
+   * of code trees contains only one single tree, and then return that singleton 
+   * list.
    *
    * Hint: before writing the implementation,
-   *  - start by defining the parameter types such that the above example invocation
-   *    is valid. The parameter types of `until` should match the argument types of
-   *    the example invocation. Also define the return type of the `until` function.
+   *  - start by defining the parameter types such that the above example 
+   *    invocation is valid. The parameter types of `until` should match the 
+   *    argument types of the example invocation. Also define the return type of 
+   *    the `until` function.
    *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
    */
-  def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
+  def until[T](pred: T => Boolean, action: T => T)(obj: T): T = 
+    if (pred(obj)) obj else until(pred, action)(action(obj))
 
   /**
-   * This function creates a code tree which is optimal to encode the text `chars`.
+   * This function creates a code tree which is optimal to encode the text 
+   * `chars`.
    *
-   * The parameter `chars` is an arbitrary text. This function extracts the character
-   * frequencies from that text and creates a code tree based on them.
+   * The parameter `chars` is an arbitrary text. This function extracts the 
+   * character frequencies from that text and creates a code tree based on them.
    */
-  def createCodeTree(chars: List[Char]): CodeTree = ???
-
-
+  def createCodeTree(chars: List[Char]): CodeTree = {
+    val freqs = times(chars)
+    val leafList = makeOrderedLeafList(freqs)
+    until(singleton, combine)(leafList).head
+  }
 
   // Part 3: Decoding
 
   type Bit = Int
 
   /**
-   * This function decodes the bit sequence `bits` using the code tree `tree` and returns
-   * the resulting list of characters.
+   * This function decodes the bit sequence `bits` using the code tree `tree` 
+   * and returns the resulting list of characters.
    */
-  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
+  }
 
   /**
    * A Huffman coding tree for the French language.
